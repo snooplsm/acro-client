@@ -1,0 +1,518 @@
+<html>
+<head>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		top {
+			background-color:red;
+			display:block;
+			height: 5%;
+		}
+		footer {
+			display:block;
+			height:0%;
+			background-color:black;
+		}
+		content {
+			background-color:orange;			
+			display:block;
+			height: 65%;
+		}
+		
+		content round {
+			background-color: #F56E25;
+			display:block;
+			height:100%;
+			right:0;
+			left:0;
+			height:100%;
+			overflow: scroll;
+		}
+		
+		content round answers {
+			display:block;
+			padding: 1em;
+		}
+		
+		content round answers answer {
+			display:table;
+			margin-top:0;
+			margin-bottom:0;
+		}
+		
+		content round answers answer username {
+			display: table-cell;
+			width: 14%;
+			color: yellow;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+		
+		content round answers answer winner {
+			display: table-cell;
+			width: 20px;
+			height: 28px;
+			 vertical-align: middle;
+			background: url('img/trophy.png') center;
+		}
+		
+		acroanswer {
+			display: table-cell;
+			 vertical-align: middle;
+			cursor: pointer;
+			padding: 0.1em;
+		}
+		
+		acroanswer:hover {
+			padding: 0;
+			border: 0.1em black solid;
+		}
+		
+		.selected {
+			padding: 0;
+			border: 0.1em red solid;
+		}
+		
+		content round answers answer bonus {
+			display: table-cell;			
+			width: 44px;
+			height:28px;
+			 vertical-align: middle;
+			background: url('img/checkeredflag.png')
+		}
+		
+		content round timer {
+			display:block;
+			width:100%;
+			background-color: blue;
+		}
+		
+		content round timer text {
+			display:inline-block;
+			font-size: 200%;
+			background-color:yellow;
+			right:0	;
+		}
+		
+		content round timer div {
+			display:inline-block;
+			width:50%;
+		}
+		
+		content round acro {
+			display:block;
+			background-color: green;
+			text-align: center;
+			margin-left: auto;
+			margin-right: auto;
+			padding-top: 1%;
+			padding-bottom: 1%;
+			width:100%;
+			font-size: 315%;
+			letter-spacing:1em;
+			text-shadow:#fff 0px 1px 0, #000 0 -1px 0;
+		}
+		
+		content round answer {
+			margin-top: 2%;
+			margin-bottom: 2%	;
+			margin-left:1%;
+			margin-right:1%;
+			display:block;
+		}
+		
+		content round answer received {
+			text-align:center;
+			display:block;
+			width:100%;
+			/*visibility:hidden;*/
+		}
+		
+		content round answer input {
+			text-align: center;
+			display:block;
+			padding-top:1%;
+			padding-bottom:1%;
+			width: 100%;
+			font-size: 225%;
+			letter-spacing:-.01em;
+		}
+		
+		chat {
+			background-color:white;			
+			display:block;
+			margin-left: 8px;
+			margin-right: 15px;
+			height: 30%;
+		}
+		
+		chat lines {			
+			float:left;
+			width:80%;
+			height:100%;
+			overflow:scroll;
+		}
+		
+		
+		chat lines line {
+			display:block;
+			line-height: 150%;
+		}
+		
+		chat lines line username {
+			display: inline-block;
+			color: red;
+			padding-right: .1em;
+		}
+		
+		chat lines line username:after {
+			content:":";
+		}
+		
+		chat lines line message {
+			color: blue;
+		}
+		
+		chat users {
+			float: right;
+			display:block;
+			width: 20%;
+			height:100%	;
+			top:0;
+			bottom:0;
+			background-color: yellow;
+			overflow:scroll;
+		}
+		
+		chat users user {
+			display: block;
+		}
+		
+		chat users user score {
+			display: inline-block;
+			width: 10%;
+		}
+		
+		chat users user name {
+			width: 90%;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+		
+		.hide {
+			visibility: hidden;
+		}
+		
+		.meter { 
+					height: 20px;  /* Can be anything */
+					position: relative;
+					background: #555;
+					-moz-border-radius: 25px;
+					-webkit-border-radius: 25px;
+					border-radius: 25px;
+					padding: 10px;
+					-webkit-box-shadow: inset 0 -1px 1px rgba(255,255,255,0.3);
+					-moz-box-shadow   : inset 0 -1px 1px rgba(255,255,255,0.3);
+					box-shadow        : inset 0 -1px 1px rgba(255,255,255,0.3);
+				}
+				.meter > span {
+					display: block;
+					height: 100%;
+					   -webkit-border-top-right-radius: 8px;
+					-webkit-border-bottom-right-radius: 8px;
+					       -moz-border-radius-topright: 8px;
+					    -moz-border-radius-bottomright: 8px;
+					           border-top-right-radius: 8px;
+					        border-bottom-right-radius: 8px;
+					    -webkit-border-top-left-radius: 20px;
+					 -webkit-border-bottom-left-radius: 20px;
+					        -moz-border-radius-topleft: 20px;
+					     -moz-border-radius-bottomleft: 20px;
+					            border-top-left-radius: 20px;
+					         border-bottom-left-radius: 20px;
+					background-color: rgb(43,194,83);
+					background-image: -webkit-gradient(
+					  linear,
+					  left bottom,
+					  left top,
+					  color-stop(0, rgb(43,194,83)),
+					  color-stop(1, rgb(84,240,84))
+					 );
+					background-image: -moz-linear-gradient(
+					  center bottom,
+					  rgb(43,194,83) 37%,
+					  rgb(84,240,84) 69%
+					 );
+					-webkit-box-shadow: 
+					  inset 0 2px 9px  rgba(255,255,255,0.3),
+					  inset 0 -2px 6px rgba(0,0,0,0.4);
+					-moz-box-shadow: 
+					  inset 0 2px 9px  rgba(255,255,255,0.3),
+					  inset 0 -2px 6px rgba(0,0,0,0.4);
+					box-shadow: 
+					  inset 0 2px 9px  rgba(255,255,255,0.3),
+					  inset 0 -2px 6px rgba(0,0,0,0.4);
+					position: relative;
+					overflow: hidden;
+				}
+				.meter > span:after, .animate > span > span {
+					content: "";
+					position: absolute;
+					top: 0; left: 0; bottom: 0; right: 0;
+					background-image: 
+					   -webkit-gradient(linear, 0 0, 100% 100%, 
+					      color-stop(.25, rgba(255, 255, 255, .2)), 
+					      color-stop(.25, transparent), color-stop(.5, transparent), 
+					      color-stop(.5, rgba(255, 255, 255, .2)), 
+					      color-stop(.75, rgba(255, 255, 255, .2)), 
+					      color-stop(.75, transparent), to(transparent)
+					   );
+					background-image: 
+						-moz-linear-gradient(
+						  -45deg, 
+					      rgba(255, 255, 255, .2) 25%, 
+					      transparent 25%, 
+					      transparent 50%, 
+					      rgba(255, 255, 255, .2) 50%, 
+					      rgba(255, 255, 255, .2) 75%, 
+					      transparent 75%, 
+					      transparent
+					   );
+					z-index: 1;
+					-webkit-background-size: 50px 50px;
+					-moz-background-size: 50px 50px;
+					-webkit-animation: move 2s linear infinite;
+					   -webkit-border-top-right-radius: 8px;
+					-webkit-border-bottom-right-radius: 8px;
+					       -moz-border-radius-topright: 8px;
+					    -moz-border-radius-bottomright: 8px;
+					           border-top-right-radius: 8px;
+					        border-bottom-right-radius: 8px;
+					    -webkit-border-top-left-radius: 20px;
+					 -webkit-border-bottom-left-radius: 20px;
+					        -moz-border-radius-topleft: 20px;
+					     -moz-border-radius-bottomleft: 20px;
+					            border-top-left-radius: 20px;
+					         border-bottom-left-radius: 20px;
+					overflow: hidden;
+				}
+
+				.animate > span:after {
+					display: none;
+				}
+
+				@-webkit-keyframes move {
+				    0% {
+				       background-position: 0 0;
+				    }
+				    100% {
+				       background-position: 50px 50px;
+				    }
+				}
+
+				.orange > span {
+					background-color: #f1a165;
+					background-image: -moz-linear-gradient(top, #f1a165, #f36d0a);
+					background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #f1a165),color-stop(1, #f36d0a));
+					background-image: -webkit-linear-gradient(#f1a165, #f36d0a); 
+				}
+
+				.red > span {
+					background-color: #f0a3a3;
+					background-image: -moz-linear-gradient(top, #f0a3a3, #f42323);
+					background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #f0a3a3),color-stop(1, #f42323));
+					background-image: -webkit-linear-gradient(#f0a3a3, #f42323);
+				}
+
+				.nostripes > span > span, .nostripes > span:after {
+					-webkit-animation: none;
+					background-image: none;
+				}
+	</style>
+	
+	<title>Acro</title>
+</head>
+<body>
+	
+	<top>
+		yo
+	</top>
+	<content>
+		<round style="display:none">
+			<timer>
+				<!--div class="meter orange nostripes">
+					<span style="width: 22%">
+				</div-->	
+				<text>
+					60s
+				</text>
+			</timer>
+			<acro>ABCDEFG</acro>
+
+			<answer>			
+				<received>Answer Received at 10.33s</received>	
+				<input type="text" maxlen=100/>
+			</answer>
+		</round>
+		<round>
+			<timer>
+				<!--div class="meter orange nostripes">
+					<span style="width: 22%">
+				</div-->	
+				<text>
+					60s
+				</text>
+			</timer>
+			<answers>
+				<answer>
+					<username class="hide">Ryan</username>
+					<winner class="hide">r</winner>
+					<bonus></bonus>
+					<votedForWinner></votedForWinner>
+					<acroanswer class="selected">I like to poop on tracks.  Most of the time this is alright. Oh god this is a lot of space i wish it would word wrap already.  </acroanswer>
+				</answer>
+				<answer>
+					<username>Ryan</username>
+					<winner>r</winner>
+					<bonus></bonus>
+					<votedForWinner></votedForWinner>
+					<acroanswer>I like to poop on tracks.  Most of the time this is alright. Oh god this is a lot of space i wish it would word wrap already.  </acroanswer>
+				</answer>
+				<answer>
+					<username>Ryan</username>
+					<winner>r</winner>
+					<bonus></bonus>
+					<votedForWinner></votedForWinner>
+					<acroanswer>I like to poop on tracks.  Most of the time this is alright. Oh god this is a lot of space i wish it would word wrap already.  </acroanswer>
+				</answer>
+				<answer>
+					<username>Ryan</username>
+					<winner>r</winner>
+					<bonus></bonus>
+					<votedForWinner></votedForWinner>
+					<acroanswer>I like to poop on tracks.  Most of the time this is alright. Oh god this is a lot of space i wish it would word wrap already.  </acroanswer>
+				</answer>
+				<answer>
+					<username>Ryan</username>
+					<winner>r</winner>
+					<bonus></bonus>
+					<votedForWinner></votedForWinner>
+					<acroanswer>I like to poop on tracks.  Most of the time this is alright. Oh god this is a lot of space i wish it would word wrap already.  </acroanswer>
+				</answer>
+				<answer>
+					<username>Ryan</username>
+					<winner>r</winner>
+					<bonus></bonus>
+					<votedForWinner></votedForWinner>
+					<acroanswer>I like to poop on tracks.  Most of the time this is alright. Oh god this is a lot of space i wish it would word wrap already.  </acroanswer>
+				</answer>
+				<answer>
+					<username>Ryan McenBoysss s</username>
+					<winner>r</winner>
+					<bonus></bonus>
+					<votedForWinner></votedForWinner>
+					<acroanswer>I like to poop on tracks.  Most of the time this is alright. Oh god this is a lot of space i wish it would word wrap already.  </acroanswer>
+				</answer>
+				<answer>
+					<username>Ryan</username>
+					<winner>r</winner>
+					<bonus></bonus>
+					<votedForWinner></votedForWinner>
+					<acroanswer>I like to poop on tracks.  Most of the time this is alright. Oh god this is a lot of space i wish it would word wrap already.  </acroanswer>
+				</answer>
+				<answer>
+					<username>Ryan</username>
+					<winner>r</winner>
+					<bonus></bonus>
+					<votedForWinner></votedForWinner>
+					<acroanswer>I like to poop on tracks.  Most of the time this is alright. Oh god this is a lot of space i wish it would word wrap already.  </acroanswer>
+				</answer>
+			</answers>
+		</round>	
+	</content>
+	<chat>
+		<lines>
+			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
+			<line><username>daniel</username><message>p</message></line>
+			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
+			<line><username>daniel</username><message>p</message></line>
+			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
+			<line><username>daniel</username><message>p</message></line>
+			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
+			<line><username>daniel</username><message>p</message></line>
+			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
+			<line><username>daniel</username><message>p</message></line>
+			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
+			<line><username>daniel</username><message>p</message></line>
+			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
+			<line><username>daniel</username><message>p</message></line>
+		</lines>
+		<users>
+			<user>
+				<score>10</score>
+				<name>Ryan</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>James Von Vinkle</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>Ryan</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>James Von Vinkle</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>Ryan</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>James Von Vinkle</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>Ryan</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>James Von Vinkle</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>Ryan</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>James Von Vinkle</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>Ryan</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>James Von Vinkle</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>Ryan</score>
+			</user>
+			<user>
+				<score>10</score>
+				<name>James Von Vinkle</score>
+			</user>
+		</users>
+	</chat>
+	<audio id="round_music" preload="auto">
+		<source src="audio/round_music.m4a" type="audio/m4a">
+		<source src="audio/round_music.mp3" type="audio/mp3">
+	</audio>
+</body>
+</html>
