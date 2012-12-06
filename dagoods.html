@@ -65,47 +65,28 @@
 			background-color: red;			
 		}
 		
-		totall score {
-			display:table-cell;
-			vertical-align: middle;
-			width:20%;
-			height:100%;
-			font-size: 200%;
-			box-sizing:border-box;
-			text-align: center;
-			border: 1px solid;
-		}
-		
-		totall name {
-			background-color: white;			
-			display: table-cell;
-			vertical-align: middle;
-			width:100%;
-			height:100%;
-			padding-left: 1em;
-		}
-		
-		totalr score {
+		totalscore {
 			display:table-cell;
 			vertical-align: middle;
 			text-align:center;
 			width: 20%;
 			height: 100%;
 			box-sizing:border-box;
-			font-size: 200%;
+			font-size: 225%;
 			border: 1px solid;
 		}
 		
-		totalr name {
+		totalname {
 			background-color: white;			
 			display: table-cell;
 			vertical-align: middle;
 			width:100%;
 			height:100%;
+			font-size: 200%;
 			padding-left: 1em;
 		}
 		
-		totalr name p {
+		totalname p {
 			   vertical-align: middle; 
 		}
 		totalr {
@@ -146,6 +127,17 @@
 		
 		content round faceoffanswers faceoffanswer:hover {
 			border: 0.1em black solid;
+		}
+		
+		content round faceoffanswers faceoffanswer score {
+			display:table-cell;
+			height: 100%;
+			width: 15%;
+			font-size: 180%;
+			text-align: center;
+			vertical-align: middle;
+			background-color:purple;
+			
 		}
 		
 		content round faceoffanswers faceoffanswer username {
@@ -504,20 +496,22 @@
 				<spacermaker>
 				</spacermaker>
 				<faceoffanswer>
+					<score class="hide">10</score>
 					<username>Ryan</username>
 					<faceoffacroanswer>I like to poop here</faceoffacroanswer>
 				</faceoffanswer>	
 				<spacermaker>
 				</spacermaker>
 				<faceoffanswer>
+					<score class="hide">10</score>
 					<username>Porkey Nuts</username>
 					<faceoffacroanswer>I like to poop herz</faceoffacroanswer>
 				</faceoffanswer>
 			</faceoffanswers>
 			<faceofftotals>
 				<cham>
-				<totall><score>15</score><name><p>Ryan</p></name></totall>
-				<totalr><score>17</score><name><p>Kevin Rickshaw</p></name></totalr>
+				<totall><totalscore>15</totalscore><totalname><p>Ryan</p></totalname></totall>
+				<totalr><totalscore>17</totalscore><totalname><p>Kevin Rickshaw</p></totalname></totalr>
 				</cham>
 			</faceofftotals>
 		</round>
@@ -676,6 +670,10 @@
 	<audio id="round_music" preload="auto">
 		<source src="audio/round_music.m4a" type="audio/m4a">
 		<source src="audio/round_music.mp3" type="audio/mp3">
+	</audio>
+	<audio id="welcome" preload="auto">
+		<source src="audio/welcome_to_acro.m4a" type="audio/m4a">
+		<source src="audio/welcome_to_acro.mp3" type="audio/mp3">
 	</audio>
 </body>
 </html>

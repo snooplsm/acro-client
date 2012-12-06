@@ -443,7 +443,7 @@ function message(msg) {
 }
 
 $(document).ready(function() {
-
+	$("#welcome").play();
 	if (!("WebSocket" in window)) {
 		alert('no websocket?');
 		$('#chatLog, input, button, #examples').fadeOut("fast");
