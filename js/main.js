@@ -48,7 +48,7 @@ function GUID() {
 };
 
 function connect() {
-	var host = "ws://localhost:8081/websocket";
+	var host = "ws://ryangravener.com:8081/websocket";
 	try {
 		socket = new WebSocket(host);
 		message('<p class="event">Socket Status: ' + socket.readyState);
@@ -57,9 +57,12 @@ function connect() {
 		}
 		setCookie("player_id",player_id,200);
 		socket.onopen = function() {
-			if (rooms == null || rooms.length == 0) {
+			if(username==null) {
+				requestUsername();
+			} else {
 				requestRooms();
 			}
+			
 		}
 		socket.onmessage = function(msg) {
 			console.log(msg.data);
@@ -106,8 +109,8 @@ function onRoomClick(event) {
 }
 
 function requestUsername() {
-	$("#rooms").hide();
-	$("#login").show();
+	$("round").addClass('gone');
+	$("#login").removeClass('gone');
 }
 
 function onAnswerClick(event) {
@@ -129,6 +132,25 @@ function onAnswerPress(event) {
 	if (event.which == 13) {
 		sendAcronym($(this).attr('value'));
 	}
+}
+
+function onUsernamePress(event) {
+	if(event.which==13) {
+		var val = $(this).val().trim();
+		if(val!=null) {
+			if(val.length>0 && val.length<15) {
+				username = val;
+				onUsername(username);
+			} else {
+				alert("Username must be > 1 < 15 length");
+			}
+		}
+	}
+}
+
+function onUsername(data) {
+	alert('on ' + data);
+	requestRooms();
 }
 
 function sendAcronym(acro) {
@@ -331,7 +353,29 @@ function playRound(data) {
 
 function handleRoomList(data) {
 	rooms = data;
-	showRooms(rooms);
+	//showRooms(rooms);
+//	alert('handle roomlist');
+	if(username!=null) {
+		joinLargestRoom(data);
+	} else {
+		requestUsername();
+	}
+}
+
+function joinLargestRoom(data) {
+	var maxRoom;
+	for(var key in data) {
+		var room = data[key];
+		if(maxRoom==null) {
+			maxRoom = room;
+		}
+		if(room.player_count>maxRoom.player_count && room.player_count < 15) {
+			maxRoom = room;
+		}
+	}
+	//alert(JSON.stringify(maxRoom));
+	joinRoom(maxRoom.id);
+	
 }
 
 function handleNewUser(data) {
@@ -372,14 +416,12 @@ function handleJoinedRoom(data) {
 }
 
 function hideRooms() {
-	$('#rooms').hide();
+	$("round").addClass('gone');
 }
 
 function showRoom(room) {
-	$("#round").append("<p>Welcome to " + room.name + "<br/>Waiting for the current round to end</p>");
-	$("#round").show();
-	$('#round div').show();
-	$("#answer").hide();
+	$('round').addClass('gone');
+	$('#waiting').removeClass('gone');
 }
 
 function showWinners(data) {
@@ -402,6 +444,8 @@ function showRooms(rooms) {
 }
 
 function showRound(round) {
+	$("round").addClass('gone');
+	$('#waiting').removeClass('gone');
 	$('#answers').hide();
 	$('#acronym').empty();
 	$('#round p').empty();
@@ -443,7 +487,7 @@ function message(msg) {
 }
 
 $(document).ready(function() {
-	$("#welcome").play();
+	$("#welcome")[0].play();
 	if (!("WebSocket" in window)) {
 		alert('no websocket?');
 		$('#chatLog, input, button, #examples').fadeOut("fast");
@@ -461,6 +505,7 @@ $(document).ready(function() {
 		});
 		$('#rooms p').live('click', onRoomClick);
 		$('#answers p').live('click', onAnswerClick);
+		$('inputcont input').live('keypress', onUsernamePress);
 		$('#answer input').live('keypress', onAnswerPress);
 	} //End connect
 });
