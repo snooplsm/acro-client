@@ -189,7 +189,6 @@ function sendAcronym(acro) {
 }
 
 function joinRoom(roomId) {
-	alert('joining room ' + roomId);
 	socket.send(JSON.stringify({
 		type: "jr",
 		username: username,
