@@ -48,7 +48,7 @@ function GUID() {
 };
 
 function connect() {
-	var host = "ws://ryangravener.com:8081/websocket";
+	var host = "ws://192.168.1.3:8081/websocket";
 	try {
 		socket = new WebSocket(host);
 		message('<p class="event">Socket Status: ' + socket.readyState);
@@ -330,17 +330,33 @@ function showVoteCount(data) {
 }
 
 function showAnswers(data) {
-	$('#round').hide();
-	$('#answers p').empty();
+	alert('show answers');
+	$("round").addClass('gone');
+	$("#vote_answers").removeClass("gone");
+	$("round answers").empty();
 	for (key in answerHtmls) {
 		delete answerHtmls[key];
 	}
 	for (key in data.answers) {
 		var answer = data.answers[key];
-		var p = $("<p/>");
-		p.attr('id', answer.player.user_id);
-		p.text((parseInt(key) + 1) + ". " + answer.text);
-		$('#answers').append(p);
+		var p = $("<answer/>");
+		var user = $("<username/>");
+		user.addClass('hide');
+		var bonus =$("<bonus/>");
+		bonus.addClass('hide');
+		p.attr('id', answer.player.user_id);		
+		var winner = $("<winner/>");
+		var vfw = $("<votedForWinner/>");
+		vfw.addClass('hide');
+		var acroanswer = $("<acroanswer/>");
+		acroanswer.text(answer.text);
+		p.append(user);
+		p.append(winner);
+		p.append(bonus);
+		p.append(vfw);
+		p.append(acroanswer);
+		winner.addClass('hide');
+		$("round answers").append(p);
 		answerHtmls[answer.player.user_id] = p;
 		if(answer.player.user_id==player_id) {
 			p.addClass('my_answer');
@@ -375,7 +391,7 @@ function handleRound(data) {
 }
 
 function playRound(data) {
-	$("#round_music").play();
+	$("#round_music")[0].play();
 }
 
 function handleRoomList(data) {
@@ -498,8 +514,8 @@ function showRound(round) {
 	$('answer input').val('').focus();
 	$('answer received').addClass('hide');
 	if (roundTimer != null) {
-		$("#round_music")[0].stop();
 		clearInterval(roundTimer);
+		$("#round_music")[0].stop();
 	}
 	roundTime = room.answer_time;
 	$('round timer').text(roundTime + "");
@@ -507,8 +523,9 @@ function showRound(round) {
 		roundTime -= 1;
 		$('round timer').text(roundTime + "");
 		if (roundTime == 0) {
-			$(#round_music)[0].stop();
 			clearInterval(roundTimer);
+			$("#round_music")[0].pause();	
+			$("#round_music")[0].currentTime=0;	
 		}
 	}, 1000);
 	$("#round_music")[0].play();
