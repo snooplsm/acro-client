@@ -319,6 +319,7 @@
 		}
 		
 		chat lines {
+			position:relative;
 			box-sizing: border-box;
 		    -moz-box-sizing: border-box;
 		    -webkit-box-sizing: border-box;			
@@ -326,15 +327,35 @@
 			width:80%;
 			height:100%;
 			border-right: 0.1em black solid;
+			display:block;
 			overflow:scroll;
 		}
 		
+		chat lines inputbox {	
+			position:absolute;
+			left:0;
+			bottom:0;
+			height: 1.8em;
+			width: 100%;
+			overflow:scroll;
+			background-color: yellow;
+			box-sizing: border-box;
+		    -moz-box-sizing: border-box;
+		    -webkit-box-sizing: border-box;
+		}
+		
+		chat lines inputbox input {
+			width:100%;
+			height:100%;
+			padding-left:1em;
+			padding-right:1em;
+		}
 		
 		chat lines line {
 			padding-left: 8px;
 			padding-right: 15px;
 			display:block;
-			line-height: 150%;
+			line-height: 125%;
 		}
 		
 		chat lines line username {
@@ -351,11 +372,21 @@
 			color: blue;
 		}
 		
+		chat lines line message.center {
+			display:block;
+			font-style: italic;
+			text-align:center;
+		}
+		
 		chat users {
 			float: right;
 			display:block;
 			width: 20%;
-			height:100%	;
+			height:100%;
+			padding: .5em;
+			box-sizing: border-box;
+		    -moz-box-sizing: border-box;
+		    -webkit-box-sizing: border-box;
 			top:0;
 			bottom:0;
 			background-color: yellow;
@@ -538,7 +569,22 @@
 				</d>
 			</waitingwrapper>
 		</round>
-		<round class="gone">
+		<round class="gone" id="waiting_for_players">
+			<timer>
+				<!--div class="meter orange nostripes">
+					<span style="width: 22%">
+				</div-->	
+				<text>
+					60s
+				</text>
+			</timer>
+			<waitingwrapper>
+				<d>
+					<waiting id="waiting_needed">Waiting for more players...</waiting>
+				</d>
+			</waitingwrapper>
+		</round>
+		<round id="make_acronym" class="gone">
 			<timer>
 				<!--div class="meter orange nostripes">
 					<span style="width: 22%">
@@ -551,14 +597,14 @@
 
 			<answer>			
 				<received>Answer Received at 10.33s</received>	
-				<input type="text" maxlen=100/>
+				<input type="text" maxlength=100/>
 			</answer>
 		</round>
 		<round class="gone" id="login">
 			<wrapper>
 			<d><requestusername>Enter a username</requestusername>
 			<inputcont>
-				<input type="text" maxlen=15/>
+				<input type="text" maxlength=14/>
 			</inputcont>
 			</d>
 			</wrapper>
@@ -670,7 +716,10 @@
 	</content>
 	<chat>
 		<lines>
-			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
+			<!-- 			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
+			<line><username>daniel</username><message>p</message></line>
+			<line><message class="center">Nick joined</message></line>
+<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
 			<line><username>daniel</username><message>p</message></line>
 			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
 			<line><username>daniel</username><message>p</message></line>
@@ -681,12 +730,13 @@
 			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
 			<line><username>daniel</username><message>p</message></line>
 			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
-			<line><username>daniel</username><message>p</message></line>
-			<line><username>snooplsm</username><message>here we go, this is the message that never ends it keeps on going on and on my friends.  Some people just started singing it not knowing what it was.</message></line>
-			<line><username>daniel</username><message>p</message></line>
+			<line><username>daniel</username><message>p</message></line> -->
+			<inputbox>
+				<input type="text" maxlength=200/>
+			</inputbox>
 		</lines>
 		<users>
-			<user>
+			<!-- <user>
 				<score>10</score>
 				<name>Ryan</score>
 			</user>
@@ -741,9 +791,10 @@
 			<user>
 				<score>10</score>
 				<name>James Von Vinkle</score>
-			</user>
+			</user> -->
 		</users>
 	</chat>
+	
 	<audio id="round_music" preload="auto">
 		<source src="audio/round_music.m4a" type="audio/m4a">
 		<source src="audio/round_music.mp3" type="audio/mp3">

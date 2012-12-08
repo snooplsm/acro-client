@@ -1,6 +1,6 @@
 var rooms = null;
-var username = getCookie('username');
-var player_id = getCookie('player_id');
+var username; 
+var player_id;
 var room_id;
 var room;
 var round;
@@ -53,9 +53,15 @@ function connect() {
 		socket = new WebSocket(host);
 		message('<p class="event">Socket Status: ' + socket.readyState);
 		if(player_id==null) {
-			player_id = GUID();
+			player_id = getCookie("player_id");
+			if(player_id==null) {
+				player_id = GUID();
+			}
 		}
 		setCookie("player_id",player_id,200);
+		if(username==null) {
+			username = getCookie("username");
+		}
 		socket.onopen = function() {
 			if(username==null) {
 				requestUsername();
@@ -111,6 +117,7 @@ function onRoomClick(event) {
 function requestUsername() {
 	$("round").addClass('gone');
 	$("#login").removeClass('gone');
+	$("inputcont input").focus();
 }
 
 function onAnswerClick(event) {
@@ -131,7 +138,25 @@ function onAnswerClick(event) {
 function onAnswerPress(event) {
 	if (event.which == 13) {
 		sendAcronym($(this).attr('value'));
+		$("answer received").text(roundTime).removeClass('hide');
 	}
+}
+
+function onChatPress(event) {
+	if(event.which==13) {
+		sendMessage($(this).attr('value'));
+		$(this).attr('value','');
+	}
+}
+
+function sendMessage(text) {
+	socket.send(JSON.stringify({
+		type: "m",
+		username: username,
+		user_id: player_id,
+		room: room.id,
+		message: text
+	}));
 }
 
 function onUsernamePress(event) {
@@ -149,7 +174,7 @@ function onUsernamePress(event) {
 }
 
 function onUsername(data) {
-	alert('on ' + data);
+	setCookie("username",data,200);
 	requestRooms();
 }
 
@@ -164,6 +189,7 @@ function sendAcronym(acro) {
 }
 
 function joinRoom(roomId) {
+	alert('joining room ' + roomId);
 	socket.send(JSON.stringify({
 		type: "jr",
 		username: username,
@@ -231,6 +257,7 @@ function handleChatMessage(data) {
 	//message.text(data.username + " joined the room.");
 	var username = $("<username/>");
 	username.text(data.username);
+	message.text(data.message);
 	line.append(username);
 	line.append(message);
 	$("chat lines").append(line);
@@ -354,7 +381,6 @@ function playRound(data) {
 function handleRoomList(data) {
 	rooms = data;
 	//showRooms(rooms);
-//	alert('handle roomlist');
 	if(username!=null) {
 		joinLargestRoom(data);
 	} else {
@@ -382,21 +408,33 @@ function handleNewUser(data) {
 	room.players[data.user_id] = data;
 	showUsers(room.players);
 	notifyNewUser(data);
+	updateWaiting(data);
+}
+
+function updateWaiting(data) {
+	if(room.player_count<3) {
+		//$('#waiting_for_players').removeClass('gone');
+		var diff = 3-room.player_count;
+		$('#waiting_needed').text('Waiting for ' + (diff) + ' more player' + ((diff==1) ? '' : 's') + '...');
+		//$('inputbox input').focus();
+	} else {
+		//$('#waiting').removeClass('gone');
+	}
 }
 
 function notifyNewUser(data) {
 	var line = $("<line/>");
 	var message = $("<message/>");
-	message.addClass('new_user');
+	message.addClass('center');
 	message.text(data.username + " joined the room.");
 	line.append(message);
 	$("chat lines").append(line);
 }
 
 function handleUserLeave(data) {
+	notifyUserLeft(room.players[data]);
 	delete room.players[data];
 	showUsers(room.players);
-	notifyUserLeft(data);
 }
 
 function notifyUserLeft(data) {
@@ -409,6 +447,7 @@ function notifyUserLeft(data) {
 }
 
 function handleJoinedRoom(data) {
+	alert('joined room');
 	room = data;
 	hideRooms();
 	showRoom(room);
@@ -421,7 +460,14 @@ function hideRooms() {
 
 function showRoom(room) {
 	$('round').addClass('gone');
-	$('#waiting').removeClass('gone');
+	if(room.player_count<3) {
+		$('#waiting_for_players').removeClass('gone');
+		var diff = 3-room.player_count;
+		$('#waiting_needed').text('Waiting for ' + (diff) + ' more player' + ((diff==1) ? '' : 's') + '...');
+		$('inputbox input').focus();
+	} else {
+		$('#waiting').removeClass('gone');
+	}
 }
 
 function showWinners(data) {
@@ -445,40 +491,43 @@ function showRooms(rooms) {
 
 function showRound(round) {
 	$("round").addClass('gone');
-	$('#waiting').removeClass('gone');
-	$('#answers').hide();
-	$('#acronym').empty();
-	$('#round p').empty();
-	$('#answer').show();
-	$('#roundTime').show();
-	$('#acronym').show();
-	$('#gameover').hide();
-	$('#acronym').append("<p id='" + round.round + "'>" + round.acronym + "</p>")
-	$('#category').text(round.category);
-	$('#round').show();
-	$('#answer input').val('').focus();
+	$("#make_acronym").removeClass('gone');
+	$('answer input').empty();
+	$('timer').show();
+	$('round acro').text(round.acronym);
+	$('answer input').val('').focus();
+	$('answer received').addClass('hide');
 	if (roundTimer != null) {
-		$("#round_music").stop();
+		$("#round_music")[0].stop();
 		clearInterval(roundTimer);
 	}
 	roundTime = room.answer_time;
-	$('#roundTime').text(roundTime + "");
+	$('round timer').text(roundTime + "");
 	roundTimer = setInterval(function() {
 		roundTime -= 1;
-		$('#roundTime').text(roundTime + "");
+		$('round timer').text(roundTime + "");
 		if (roundTime == 0) {
+			$(#round_music)[0].stop();
 			clearInterval(roundTimer);
 		}
 	}, 1000);
+	$("#round_music")[0].play();
 }
 
 function showUsers(users) {
-	$('#users p').empty();
+	$('users').empty();
 	for (var key in users) {
-		var user = users[key];
-		$('#users').append("<p id='" + key + "'>" + user.username + " (" + user.total_vote_count +") </p>");
+		var u = users[key];
+		var score = $("<score/>");
+		var user = $("<user/>");
+		var name = $("<name/>");
+		score.text(u.total_vote_count);
+		name.text(u.username);
+		user.append(score);
+		user.append(name);
+		$("users").append(user);
 	}
-	$('#users').show();
+	$('users').show();
 
 }
 
@@ -506,6 +555,7 @@ $(document).ready(function() {
 		$('#rooms p').live('click', onRoomClick);
 		$('#answers p').live('click', onAnswerClick);
 		$('inputcont input').live('keypress', onUsernamePress);
-		$('#answer input').live('keypress', onAnswerPress);
+		$('answer input').live('keypress', onAnswerPress);
+		$('lines inputbox input').live('keypress', onChatPress);
 	} //End connect
 });
