@@ -329,7 +329,6 @@ function showVoteCount(data) {
 }
 
 function showAnswers(data) {
-	alert('show answers');
 	$("round").addClass('gone');
 	$("#vote_answers").removeClass("gone");
 	$("round answers").empty();
@@ -362,10 +361,10 @@ function showAnswers(data) {
 		}
 	}
 	answerTime = room.vote_time;
-	$('#votingRoundTime').text(answerTime + "");
+	$('round timer text').text(answerTime + "");
 	votingRoundTimer = setInterval(function() {
 		answerTime -= 1;
-		$('#votingRoundTime').text(answerTime + "");
+		$('round timer text').text(answerTime + "");
 		if (answerTime == 0) {
 			clearInterval(votingRoundTimer);
 		}
@@ -462,7 +461,6 @@ function notifyUserLeft(data) {
 }
 
 function handleJoinedRoom(data) {
-	alert('joined room');
 	room = data;
 	hideRooms();
 	showRoom(room);
@@ -508,19 +506,19 @@ function showRound(round) {
 	$("round").addClass('gone');
 	$("#make_acronym").removeClass('gone');
 	$('answer input').empty();
-	$('timer').show();
 	$('round acro').text(round.acronym);
 	$('answer input').val('').focus();
 	$('answer received').addClass('hide');
 	if (roundTimer != null) {
 		clearInterval(roundTimer);
-		$("#round_music")[0].stop();
+		$("#round_music")[0].pause();
+		$("#round_music")[0].currentTIme=0;
 	}
 	roundTime = room.answer_time;
-	$('round timer').text(roundTime + "");
+	$('round timer text').text(roundTime + "");
 	roundTimer = setInterval(function() {
 		roundTime -= 1;
-		$('round timer').text(roundTime + "");
+		$('round timer text').text(roundTime + "");
 		if (roundTime == 0) {
 			clearInterval(roundTimer);
 			$("#round_music")[0].pause();	
