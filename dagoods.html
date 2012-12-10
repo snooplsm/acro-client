@@ -165,6 +165,15 @@
 			margin-bottom:0;
 		}
 		
+		content round answers answer points {
+						display: table-cell;
+			width: 10%;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+		
+
 		content round answers answer username {
 			display: table-cell;
 			width: 14%;
@@ -194,9 +203,13 @@
 			border: 0.1em black solid;
 		}
 		
-		.selected {
-			padding: 0;
+		.my_answer {
 			border: 0.1em red solid;
+		}
+		
+		.answer_selected {
+			padding: 0;
+			border: 0.1em green solid;
 		}
 		
 		content round answers answer bonus {
@@ -205,6 +218,14 @@
 			height:28px;
 			 vertical-align: middle;
 			background: url('img/checkeredflag.png')
+		}
+		
+		content round answers answer votedForWinner {
+			display: table-cell;			
+			width: 28px;
+			height:28px;
+			 vertical-align: middle;
+			background: url('img/star.svg')
 		}
 		
 		content round timer {
@@ -409,6 +430,19 @@
 			text-overflow: ellipsis;
 		}
 		
+		content round ad_container {
+			display:table;
+			height:100%;
+			margin-left:auto;
+			margin-right:auto;
+		}
+		
+		content round ad_container ad {
+			display:table-cell;
+			vertical-align:middle;
+
+		}
+		
 		.hide {
 			visibility: hidden;
 		}
@@ -609,7 +643,7 @@
 			</d>
 			</wrapper>
 		</round>
-		<round class="gone">
+		<round id="faceoff_round" class="gone">
 			<timer>
 				<text>
 					60s
@@ -637,6 +671,40 @@
 				<totalr><totalscore>17</totalscore><totalname><p>Kevin Rickshaw</p></totalname></totalr>
 				</cham>
 			</faceofftotals>
+		</round>
+		<round id="faceoff_losers">
+			<ad_container>
+				<ad>
+				<iframe id="ytplayer" type="text/html" width="640" height="360"
+				src="http://www.youtube.com/embed/GI2_afgcMms?controls=0&modestbranding=1&showinfo=0&theme=light"
+				frameborder="0" allowfullscreen></iframe>
+
+				    <script type="text/javascript" src="http://www.youtube.com/iframe_api"></script>
+				
+					<script type="text/javascript">
+
+
+				      // 4. The API will call this function when the video player is ready.
+				      function onPlayerReady(event) {
+				        event.target.playVideo();
+				      }
+
+				      // 5. The API calls this function when the player's state changes.
+				      //    The function indicates that when playing a video (state=1),
+				      //    the player should play for six seconds and then stop.
+				      var done = false;
+				      function onPlayerStateChange(event) {
+				        if (event.data == YT.PlayerState.PLAYING && !done) {
+				          setTimeout(stopVideo, 6000);
+				          done = true;
+				        }
+				      }
+				      function stopVideo() {
+				        player.stopVideo();
+				      }
+				    </script>
+					</ad>
+				</ad_container>
 		</round>
 		<round id="vote_answers" class="gone">
 			<timer>
@@ -698,6 +766,7 @@
 					<acroanswer>I like to poop on tracks.  Most of the time this is alright. Oh god this is a lot of space i wish it would word wrap already.  </acroanswer>
 				</answer>
 				<answer>
+					<points>2</points>
 					<username>Ryan</username>
 					<winner>r</winner>
 					<bonus></bonus>

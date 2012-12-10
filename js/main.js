@@ -6,6 +6,10 @@ var room;
 var round;
 var answers;
 var answerHtmls = {};
+var winnerHtml,bonusHtml;
+var winnerPointsHtml, bonusPointsHtml;
+var winnerVotersHtml = [];
+var winnerVotersPointsHtml = [];
 var roundTime;
 var roundTimer;
 var votingRoundTimer;
@@ -48,7 +52,7 @@ function GUID() {
 };
 
 function connect() {
-	var host = "ws://192.168.1.3:8081/websocket";
+	var host = "sws://192.168.1.3:8081/websocket";
 	try {
 		socket = new WebSocket(host);
 		message('<p class="event">Socket Status: ' + socket.readyState);
@@ -276,7 +280,7 @@ function handleAnswersReceived(data) {
 function handleVoteCountReceived(data) {
 	canVote = false;
 	answers = data;
-	showVoteCount(data);
+	showAnswers(data,true);
 	updateUserScores(data);
 }
 
@@ -284,7 +288,6 @@ function updateUserScores(data) {
 	console.log('updateuserscores');
 	for(answerIndex in data.answers) {
 		var answer = data.answers[answerIndex];
-		console.log(answer);
 		var playerId = answer.player.user_id;
 		var player = room.players[playerId];
 		if(player!=null) {
@@ -328,49 +331,136 @@ function showVoteCount(data) {
 	$('#answers').show();
 }
 
-function showAnswers(data) {
+function showAnswers(data,results) {
 	$("round").addClass('gone');
 	$("#vote_answers").removeClass("gone");
-	$("round answers").empty();
-	for (key in answerHtmls) {
-		delete answerHtmls[key];
+	console.log(!results);
+	if(!results) {
+		$("round answers").empty();
+		for (key in answerHtmls) {
+			delete answerHtmls[key];
+		}
 	}
 	for (key in data.answers) {
 		var answer = data.answers[key];
-		var p = $("<answer/>");
-		var user = $("<username/>");
-		user.addClass('hide');
-		var bonus =$("<bonus/>");
+		var p = answerHtmls[answer.player.user_id];
+		var user;
+		var bonus;
+		var winner;
+		var vfw;
+		var acroanswer;
+		var points;
+		if(p==null) {
+			p = $("<answer/>");
+			user = $("<user/>");
+			bonus = $("<bonus/>");
+			winner = $("<winner/>");
+			vfw = $("<votedForWinner/>");
+			acroanswer = $("<acroanswer/>");
+			points = $("<points/>");
+			p.append(points);
+			p.append(user);
+			p.append(winner);
+			p.append(bonus);
+			p.append(vfw);
+			p.append(acroanswer);
+			$("round answers").append(p);
+		} else {
+			user = p.find("user");
+			bonus = p.find("bonus");
+			winner = p.find("winner");
+			vfw = p.find("votedForWinner");
+			acroanswer = p.find("acroanswer");
+			points = p.find("points");
+		}
+		points.addClass('hide');
 		bonus.addClass('hide');
-		p.attr('id', answer.player.user_id);		
-		var winner = $("<winner/>");
-		var vfw = $("<votedForWinner/>");
 		vfw.addClass('hide');
-		var acroanswer = $("<acroanswer/>");
-		acroanswer.text(answer.text);
-		p.append(user);
-		p.append(winner);
-		p.append(bonus);
-		p.append(vfw);
-		p.append(acroanswer);
 		winner.addClass('hide');
-		$("round answers").append(p);
+		user.addClass('hide');
+		if(!results) {
+			winnerVotersHtml = [];
+			winnerVotersPointsHtml = [];
+			winnerHtml = null;
+			winnerPointsHtml = null;
+			bonusHtml = null;
+			bonusPointsHtml = null;
+		} else {
+			user.removeClass('hide');
+			user.text(answer.player.username);
+			points.removeClass('hide');
+			points.text(answer.vote_count);
+			if(data.winner==answer.player.user_id) {
+				winnerHtml = winner;
+				winnerPointsHtml = points;
+
+			}
+			if(data.speeder==answer.player.user_id) {
+				console.log('speeder is ' + answer.player.user_id);
+				bonusHtml = bonus;
+				bonusPointsHtml = points;
+			}
+			console.log(answer.player.username + " "+ answer.player.user_id + " in " + data.winner_bonuses +" ? " + $.inArray(answer.player.user_id,data.winner_bonuses));
+			if($.inArray(answer.player.user_id,data.winner_bonuses)>-1) {
+				winnerVotersHtml.push(vfw);
+				winnerVotersPointsHtml.push(points);
+			}
+		}	
+		p.attr('id',answer.player.user_id);
+		acroanswer.text(answer.text);
+		acroanswer.attr('id',answer.player.user_id);
 		answerHtmls[answer.player.user_id] = p;
 		if(answer.player.user_id==player_id) {
-			p.addClass('my_answer');
+			acroanswer.addClass('my_answer');
 		}
 	}
-	answerTime = room.vote_time;
+	
+	if(!results) {
+		answerTime = room.vote_time;
+	} else {
+		answerTime = room.new_round_time;
+		setTimeout(function() {
+			winnerHtml.removeClass('hide');
+			var pointsVal = parseInt(winnerPointsHtml.text());
+			pointsVal+=round.acronym.length;
+			winnerPointsHtml.text(""+pointsVal);
+			setTimeout(function() {
+				bonusHtml.removeClass('hide');
+				var pointsVal = parseInt(bonusPointsHtml.text());
+				pointsVal+=2;
+				bonusPointsHtml.text(""+pointsVal);
+				setTimeout(function() {
+					for(var k in winnerVotersHtml) {
+						var html = winnerVotersHtml[k];
+						html.removeClass('hide');
+						var pointsVal = parseInt(winnerVotersPointsHtml[k].text());
+						pointsVal+=1;
+						winnerVotersPointsHtml[k].text(""+pointsVal);	
+					}
+				},4000);
+			},4000);			
+		},3000);
+		
+	}
 	$('round timer text').text(answerTime + "");
+	if(votingRoundTimer!=null) {
+		clearInterval(votingRoundTimer);
+		$("#voting_music")[0].pause();
+		$("#voting_music")[0].currentTime=0;
+	}
 	votingRoundTimer = setInterval(function() {
 		answerTime -= 1;
 		$('round timer text').text(answerTime + "");
 		if (answerTime == 0) {
 			clearInterval(votingRoundTimer);
+			votingRoundTimer = null;
+			$("#voting_music")[0].pause();
+			$("#voting_music")[0].currentTime=0;
 		}
 	}, 1000);
-	
-	$('#answers').show();
+	if(!results) {
+		$("#voting_music")[0].play();
+	}
 }
 
 function handleFaceoffRound(data) {
@@ -380,6 +470,8 @@ function handleFaceoffRound(data) {
 
 function handleFaceoffLosers(data) {
 	faceoffStart = data;
+	$("round").addClass('gone');
+	$("#faceoff_losers").removeClass('gone')
 }
 
 function handleRound(data) {
@@ -462,6 +554,7 @@ function notifyUserLeft(data) {
 
 function handleJoinedRoom(data) {
 	room = data;
+	round = data.current_round;
 	hideRooms();
 	showRoom(room);
 	showUsers(room.players)
@@ -530,8 +623,21 @@ function showRound(round) {
 
 function showUsers(users) {
 	$('users').empty();
+	var	sortedUsers = []
 	for (var key in users) {
-		var u = users[key];
+		sortedUsers.push(users[key]);
+	}
+	sortedUsers.sort(function (a,b) {
+		if(a.total_vote_count > b.total_vote_count) {
+			return -1;
+		}
+		if(a.total_vote_count < b.total_vote_count) {
+			return 1;
+		}
+		return 0;
+	});
+	for (var key in sortedUsers) {
+		var u = sortedUsers[key];
 		var score = $("<score/>");
 		var user = $("<user/>");
 		var name = $("<name/>");
@@ -550,7 +656,6 @@ function message(msg) {
 }
 
 $(document).ready(function() {
-	$("#welcome")[0].play();
 	if (!("WebSocket" in window)) {
 		alert('no websocket?');
 		$('#chatLog, input, button, #examples').fadeOut("fast");
@@ -567,9 +672,35 @@ $(document).ready(function() {
 			socket.close();
 		});
 		$('#rooms p').live('click', onRoomClick);
-		$('#answers p').live('click', onAnswerClick);
+		$('acroanswer').live('click', onAnswerClick);
 		$('inputcont input').live('keypress', onUsernamePress);
 		$('answer input').live('keypress', onAnswerPress);
 		$('lines inputbox input').live('keypress', onChatPress);
 	} //End connect
 });
+
+var player;
+var playerReady = false;
+function onYouTubePlayerAPIReady() {
+  player = new YT.Player('ytplayer', {
+    events: {
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange
+    }
+  });
+}
+
+function onPlayerRead(event) {
+	var docElm = player;
+	if (docElm.requestFullscreen) {
+	    docElm.requestFullscreen();
+	}
+	else if (docElm.mozRequestFullScreen) {
+	    docElm.mozRequestFullScreen();
+	}
+	else if (docElm.webkitRequestFullScreen) {
+	    docElm.webkitRequestFullScreen();
+	}
+	
+}
+
