@@ -266,7 +266,15 @@ function handleChatMessage(data) {
 	message.text(data.message);
 	line.append(username);
 	line.append(message);
-	$("chat lines").append(line);
+	var lines = $("chat spot lines");
+	lines.append(line);
+	autoScroll(lines);
+}
+
+function autoScroll(lines) {
+	var b  =  lines[0].scrollHeight - lines[0].clientHeight  ;
+	console.log(b);
+	lines[0].scrollTop = b;
 }
 
 function handleGameOver(data) {
@@ -606,7 +614,7 @@ function notifyNewUser(data) {
 	message.addClass('center');
 	message.text(data.username + " joined the room.");
 	line.append(message);
-	$("chat lines").append(line);
+	$("chat spot lines").append(line);
 }
 
 function handleUserLeave(data) {
@@ -621,7 +629,7 @@ function notifyUserLeft(data) {
 	message.addClass('user_left');
 	message.text(data.username + " left the room.");
 	line.append(message);
-	$("chat lines").append(line);
+	$("chat spot lines").append(line);
 }
 
 function handleJoinedRoom(data) {
@@ -727,6 +735,10 @@ function message(msg) {
 	$('#chatLog').append(msg + '</p>');
 }
 
+function onChatScroll(event) {
+	console.log("scroll");
+}
+
 $(document).ready(function() {
 	if (!("WebSocket" in window)) {
 		alert('no websocket?');
@@ -747,7 +759,8 @@ $(document).ready(function() {
 		$('acroanswer').live('click', onAnswerClick);
 		$('inputcont input').live('keypress', onUsernamePress);
 		$('answer input').live('keypress', onAnswerPress);
-		$('lines inputbox input').live('keypress', onChatPress);
+		$('inputbox input').live('keypress', onChatPress);
+		$('chat spot lines').scroll(onChatScroll);
 	} //End connect
 });
 
