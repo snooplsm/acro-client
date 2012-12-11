@@ -15,7 +15,7 @@ var roundTimer;
 var votingRoundTimer;
 var socket;
 var selectedAnswer;
-var faceoffStart;
+var faceoff;
 var canVote;
 
 function setCookie(c_name,value,exdays)
@@ -52,7 +52,7 @@ function GUID() {
 };
 
 function connect() {
-	var host = "sws://192.168.1.3:8081/websocket";
+	var host = "ws://ryangravener.com:8081/websocket";
 	try {
 		socket = new WebSocket(host);
 		message('<p class="event">Socket Status: ' + socket.readyState);
@@ -237,7 +237,10 @@ function handleMessage(msg) {
 		handleAnswersReceived(data);
 	}
 	if("fas"==type) {
-		handleAnswersReceived(data);
+		handleFaceoffAnswersReceived(data);
+	}
+	if("fvc"==type) {
+		handleFaceoffVoteCountReceived(data);
 	}
 	if ("vc" == type) {
 		handleVoteCountReceived(data);
@@ -271,12 +274,24 @@ function handleGameOver(data) {
 	round = null;
 }
 
+function handleFaceoffAnswersReceived(data) {
+	answers = data;
+	showFaceoffAnswers(data);
+	canVote = true;
+}
+
 function handleAnswersReceived(data) {
 	answers = data;
 	showAnswers(data);
 	canVote = true;
 }
 
+function handleFaceoffVoteCountReceived(data) {
+	canVote = false;
+	answers = data;
+	showFaceoffAnswers(data,true);
+	updateFaceoffScores(data);
+}
 function handleVoteCountReceived(data) {
 	canVote = false;
 	answers = data;
@@ -329,6 +344,26 @@ function showVoteCount(data) {
 	}, 1000);
 	
 	$('#answers').show();
+}
+
+function showFaceoffAnswers(data,results) {
+	$("round").addClass("gone");
+	$("#faceoff_round").removeClass('gone');
+	for(key in data.answers) {
+		var answer = data.answers[key];
+		var p = $("faceoffanswers").find("#"+answer.player.user_id);
+		var user = p.find("username");
+		var score = p.find("score");
+		var acroanswer = p.find("faceoffacroanswer");
+		acroanswer.text(answer.text);
+		if(results) {
+			score.text(answer.vote_count);
+			score.removeClass('hide');
+			username.removeClass("hide");
+			username.text(answer.player.username);
+		}
+	}
+
 }
 
 function showAnswers(data,results) {
@@ -469,9 +504,46 @@ function handleFaceoffRound(data) {
 }
 
 function handleFaceoffLosers(data) {
-	faceoffStart = data;
+	faceoff = data;
 	$("round").addClass('gone');
-	$("#faceoff_losers").removeClass('gone')
+	$("#faceoff_round").removeClass('gone');
+	var players = [data.player_a,data.player_b];
+	var answers = [$("<faceoffanswer/>"),$("<faceoffanswer/>")];
+	var cham = $("<cham/>");
+	$("faceoffanswers").empty();
+	$("faceofftotals").empty();
+	$("faceofftotals").append(cham);
+	for(var i=0; i<2;i++) {
+			$("faceoffanswers").append("<spacermaker/>");
+		var answer = $("<faceoffanswer/>");
+		var player = players[i];
+		var score = $("<score/>");
+		var username = $("<username/>");
+		var faceoffacroanswer = $("<faceoffacroanswer/>");
+		answer.attr('id',player.user_id);
+		score.addClass('hide');
+		username.addClass('hide');
+		answer.append(score);
+		answer.append(username);
+		answer.append(faceoffacroanswer);
+		var total;
+		if(i==0) {
+			total = $("<totall/>");
+		} else {
+			total = $("<totalr/>");
+		}
+		var score = $("<totalscore/>");
+		score.text(""+0);
+		var namecont = $("<totalname/>");
+		var name = $("<p/>");
+		name.text(player.username);
+		total.append(score);
+		namecont.append(name);
+		total.append(namecont);
+		cham.append(total);
+		$("faceoffanswers").append(answer);
+		cham.append(total);
+	}
 }
 
 function handleRound(data) {
@@ -684,8 +756,8 @@ var playerReady = false;
 function onYouTubePlayerAPIReady() {
   player = new YT.Player('ytplayer', {
     events: {
-      'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange
+ //     'onReady': onPlayerReady,
+   //   'onStateChange': onPlayerStateChange
     }
   });
 }
